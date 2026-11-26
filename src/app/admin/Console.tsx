@@ -37,7 +37,7 @@ const groups: Array<{label:string;tabs:Tab[]}> = [
   {label:'内容审核',tabs:['overview','review','review-records','review-rules']},
   {label:'提示词强化 · 监控',tabs:['runs']},
   {label:'调优',tabs:['playground','intent','prompts']},
-  {label:'配置',tabs:['models','scenes','settings']},
+  {label:'配置',tabs:['models','settings']},
   {label:'审计',tabs:['audit']},
 ];
 

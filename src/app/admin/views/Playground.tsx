@@ -21,12 +21,10 @@ type Role = keyof typeof roleLabels;
 const MAX_IMAGES = 3;
 
 export default function Playground({data,refresh}:{data:ConsoleData;refresh:()=>Promise<void>}) {
-  const {config,prompts,scenes} = data;
+  const {config,prompts} = data;
   const [text,setText] = useState(cases[0].text);
   const [modelId,setModelId] = useState(config.active_model_id);
   const [version,setVersion] = useState(prompts.active_version);
-  const [scene,setScene] = useState('');
-  const [entry,setEntry] = useState('');
   const [refRole,setRefRole] = useState<Role>('');
   const [images,setImages] = useState<RefImage[]>([]);
   const [imageUrl,setImageUrl] = useState('');
@@ -39,7 +37,7 @@ export default function Playground({data,refresh}:{data:ConsoleData;refresh:()=>
   const ready = config.models.filter(m=>m.enabled&&m.key_configured);
   const selectedReady = ready.some(m=>m.id===modelId);
   // Mirrors the website request: only non-empty fields are sent.
-  const context = Object.fromEntries(Object.entries({entry,scene,reference_role:refRole,
+  const context = Object.fromEntries(Object.entries({reference_role:refRole,
     reference_images:images.length?images.map(image=>image.src):''}).filter(([,value])=>value!==''));
   async function addFiles(files: FileList|null) {
     if (!files?.length) return;
@@ -97,10 +95,6 @@ export default function Playground({data,refresh}:{data:ConsoleData;refresh:()=>
             {imageError?<p className="field-error" role="alert">{imageError}</p>:<p className="field-hint">上传的图片会在浏览器内压缩到 1600px 以内；图片只用于本次识别，不会保存。</p>}
           </div>
           {images.length>0&&<Field label="参考图用途" htmlFor="pg-role" hint="reference_role，决定识图时关注主体、风格还是构图"><select id="pg-role" value={refRole} onChange={e=>setRefRole(e.target.value as Role)}>{(Object.keys(roleLabels) as Role[]).map(key=><option key={key} value={key}>{key===''?'不指定（按内容参考）':roleLabels[key]}</option>)}</select></Field>}
-          <div className="form-row two">
-            <Field label="使用场景" htmlFor="pg-entry" hint="context.entry"><select id="pg-entry" value={entry} onChange={e=>setEntry(e.target.value)}><option value="">不指定</option>{scenes.filter(s=>s.enabled).map(s=><option key={s.id} value={s.id}>{s.name}（{s.id}）</option>)}</select></Field>
-            <Field label="业务描述" htmlFor="pg-scene" hint="context.scene（选填，不填则完全按原文强化）"><input id="pg-scene" value={scene} onChange={e=>setScene(e.target.value)} placeholder="选填，如：家纺电商图" maxLength={100}/></Field>
-          </div>
           <div className="form-row">
             <Field label="强化模型" htmlFor="pg-model"><select id="pg-model" value={modelId} onChange={e=>setModelId(e.target.value)}>{config.models.map(m=><option key={m.id} value={m.id}>{formatModelLabel(m)}{!m.enabled?' · 已停用':!m.key_configured?' · 缺少密钥':''}</option>)}</select></Field>
             <Field label="提示词版本" htmlFor="pg-version"><select id="pg-version" value={version} onChange={e=>setVersion(Number(e.target.value))}>{prompts.versions.map(p=><option key={p.version} value={p.version}>V{p.version}{p.version===prompts.active_version?'（生效中）':''} · {p.note}</option>)}</select></Field>

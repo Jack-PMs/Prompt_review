@@ -121,16 +121,17 @@ export function db(): Database.Database {
   const settings = conn.prepare('INSERT OR IGNORE INTO settings(key,value,updated_at) VALUES (?,?,?)');
   settings.run('active_prompt_version', '5', now);
   settings.run('fallback_scene', DEFAULT_FALLBACK_SCENE, now);
-  settings.run('active_model_id', 'qwen-flash', now);
-  settings.run('backup_model_id', '', now);
+  settings.run('active_model_id', 'runninghub-doubao', now);
+  settings.run('backup_model_id', 'qwen-flash', now);
   // Both verified to read images through their channels (base64 and URL).
   settings.run('vision_model_id', 'qwen-flash', now);
-  settings.run('vision_backup_model_id', 'gemini-flash-lite', now);
+  settings.run('vision_backup_model_id', 'runninghub-doubao', now);
   // Intent recognition via Decisions; 'rules' keeps the original heuristic only.
   settings.run('intent_mode', 'decisions', now);
   settings.run('config_revision', '1', now);
   const insertModel = conn.prepare('INSERT OR IGNORE INTO models(id,provider,model,enabled,timeout_ms,max_output_tokens,priority,updated_at) VALUES (?,?,?,?,?,?,?,?)');
   const seeds: Array<[string,Provider,string,number]> = [
+    ['runninghub-doubao','runninghub','bytedance/doubao-seed-2.1-lite',0],
     ['qwen-flash','qwen','qwen3.8-flash',1],
     ['gpt-luna','apiyi','gpt-6-luna',2],
     ['gemini-flash-lite','bananarouter','gemini-3.5-flash-lite',3],
@@ -138,7 +139,7 @@ export function db(): Database.Database {
     ['runninghub-deepseek','runninghub','deepseek/deepseek-v4.1-flash',5],
     ['deepseek-flash','apiyi','deepseek-flash',6],
   ];
-  for (const [id,provider,model,priority] of seeds) insertModel.run(id,provider,model,1,20000,id==='deepseek-flash'?1600:1200,priority,now);
+  for (const [id,provider,model,priority] of seeds) insertModel.run(id,provider,model,1,20000,id==='deepseek-flash'?1600:id==='runninghub-doubao'?1400:1200,priority,now);
   // Starter scenes: the homepage and the canvas tools. Rules and fallback start empty (global fallback applies).
   const insertScene = conn.prepare('INSERT OR IGNORE INTO scenes(id,name,rules,fallback_scene,enabled,updated_at) VALUES (?,?,\'\',\'\',1,?)');
   for (const [id,name] of [['home','首页'],['product-reshoot','产品重拍'],['local-edit','局部编辑'],['pattern-layout','花型排版'],['model-gen','真人模特生成']]) insertScene.run(id,name,now);
@@ -210,6 +211,18 @@ export function db(): Database.Database {
         now,
       );
       settings.run('enhance_prompt_v5_activated', '1', now);
+    })();
+  }
+  // 默认提示词强化模型切换为豆包 Seed 2.1 Lite（原生看图），异构备用模型切换为 Qwen 3.8 Flash（百炼直连）
+  if (!conn.prepare("SELECT 1 FROM settings WHERE key='default_enhance_doubao_v1'").get()) {
+    conn.transaction(() => {
+      conn.prepare('INSERT OR IGNORE INTO models(id,provider,model,enabled,timeout_ms,max_output_tokens,priority,updated_at) VALUES (?,?,?,?,?,?,?,?)')
+        .run('runninghub-doubao', 'runninghub', 'bytedance/doubao-seed-2.1-lite', 1, 20000, 1400, 0, now);
+      conn.prepare("UPDATE models SET enabled=1, priority=0, updated_at=? WHERE id='runninghub-doubao'").run(now);
+      conn.prepare("UPDATE settings SET value='runninghub-doubao', updated_at=? WHERE key='active_model_id'").run(now);
+      conn.prepare("UPDATE settings SET value='qwen-flash', updated_at=? WHERE key='backup_model_id'").run(now);
+      conn.prepare("UPDATE settings SET value='runninghub-doubao', updated_at=? WHERE key='vision_backup_model_id'").run(now);
+      settings.run('default_enhance_doubao_v1', '1', now);
     })();
   }
   // A marker prevents later starts from undoing an operator's edits or disabled models.

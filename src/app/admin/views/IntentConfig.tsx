@@ -797,7 +797,7 @@ export default function IntentConfigView({
       {/* 子面板 3：创作动作路由与主题品类词表编辑器 */}
       {subTab === 'rules' && (
         <div className="stack">
-          <Card title="创作动作分类与强化模板路由表" description="定义识别出每种动作后自动分流到哪个「使用场景」强化模板">
+          <Card title="创作动作分类与强化模板路由表" description="定义识别出每种创作动作后自动匹配哪套专属强化模板">
             <div className="stack">
               {draft.actions.map((act, idx) => (
                 <div key={act.id} style={{ border: '1px solid var(--border)', borderRadius: 10, padding: 14 }}>
@@ -841,7 +841,7 @@ export default function IntentConfigView({
                         }}
                       />
                     </Field>
-                    <Field label="路由绑定的强化场景模板" htmlFor={`act-scene-${act.id}`} hint="在「使用场景」页可继续细调该场景的具体扩写规则">
+                    <Field label="路由绑定的强化模板" htmlFor={`act-scene-${act.id}`} hint="识别出该动作后自动套用对应的专属扩写规则">
                       <select
                         id={`act-scene-${act.id}`}
                         value={act.scene_id}

@@ -21,7 +21,10 @@ const FAILOVER_CODES = ['PROVIDER_TIMEOUT', 'PROVIDER_ERROR', 'PROVIDER_UNAVAILA
 /** 判断当前选用的强化模型是否原生支持多模态看图 */
 function isVisionCapableEnhanceModel(model: ModelConfig): boolean {
   if (model.provider === 'deepseek') return false;
-  if (model.model.includes('deepseek')) return false;
+  if (model.model.includes('deepseek') && !model.model.includes('vision')) return false;
+  if (model.provider === 'runninghub') {
+    return /^(?:bytedance\/doubao-seed-2\.1|qwen\/|glm\/glm-\d+v)/i.test(model.model) || model.model.includes('vision');
+  }
   return ['qwen', 'gemini', 'openai', 'apiyi', 'bananarouter'].includes(model.provider);
 }
 

@@ -55,7 +55,7 @@ export default function SettingsView({config,refresh,notify}:{config:Config;refr
         <Card title="参考图识别" description="仅当所选强化模型不支持原生看图时，由识图模型先提取画面视觉描述再交给强化模型；多模态强化模型默认直接看图"
           actions={vision.primary_available?<Badge tone="success">可用</Badge>:vision.available?<Badge tone="warning">由备用识图</Badge>:<Badge tone="danger">不可用</Badge>}>
           <div className="form-row two">
-            <Field label="识图模型" htmlFor="set-vision" hint="必须是能看图的模型；已验证 qwen3.8-flash、gemini-3.5-flash-lite">
+            <Field label="识图模型" htmlFor="set-vision" hint="必须是能看图的模型；已验证 bytedance/doubao-seed-2.1-lite、qwen3.8-flash、gemini-3.5-flash-lite">
               <select id="set-vision" value={visionId} onChange={e=>setVisionId(e.target.value)}>{enabled.map(m=><option key={m.id} value={m.id}>{formatModelLabel(m)}{!m.key_configured?' · 缺少密钥':''}</option>)}</select></Field>
             <Field label="识图备用模型" htmlFor="set-vision-backup" hint="建议选不同渠道的模型">
               <select id="set-vision-backup" value={effectiveVisionBackup} onChange={e=>setVisionBackupId(e.target.value)}><option value="">不使用</option>{enabled.filter(m=>m.id!==visionId).map(m=><option key={m.id} value={m.id}>{formatModelLabel(m)}{!m.key_configured?' · 缺少密钥':''}</option>)}</select></Field>
