@@ -1,0 +1,31 @@
+{
+  "name": "prompt-enhancement-console",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -H 127.0.0.1 -p 6770",
+    "build": "next build",
+    "start": "next start -H 127.0.0.1 -p 6770",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "benchmark": "node --env-file=.env --import tsx scripts/benchmark.ts",
+    "verify:syntax": "node --env-file=.env --import tsx scripts/verify-syntax.ts",
+    "verify:moderation": "node --env-file=.env --import tsx scripts/verify-moderation.ts",
+    "verify:copyright": "node --env-file=.env --import tsx scripts/verify-copyright.ts"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.2.0",
+    "next": "^16.3.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^20.19.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "tsx": "^4.23.12",
+    "typescript": "~5.9.3"
+  },
+  "engines": { "node": ">=20.9.0" }
+}

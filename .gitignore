@@ -1,0 +1,27 @@
+node_modules/
+.next/
+.env*
+!.env.example
+data/
+output/
+*.tsbuildinfo
+.DS_Store
+
+# 排除含内嵌实拍/敏感测试图或真实历史用户记录的大体积报告与采集脚本（仅留本机，不进公开仓库）
+/*对比报告*.html
+/*实测报告*.html
+docs/*对比报告*.html
+docs/*图文实测报告*.html
+docs/*真实历史*
+docs/*真实违规*
+docs/提示词审核50条待确认样本集.md
+scripts/collect-*.ts
+scripts/prepare-*.ts
+scripts/build-hard-images-gallery.ts
+scripts/build-pol-sex-gallery.ts
+scripts/run-real-top50*.ts
+scripts/test-real-top50.ts
+scripts/run-image-*.ts
+scripts/run-pol-sex-*.ts
+scripts/run-50-benchmark.mjs
+
